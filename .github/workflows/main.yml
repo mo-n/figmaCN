@@ -1,0 +1,49 @@
+name: Release JS File
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Read and parse JSON file
+      id: read-json
+      run: |
+        config=$(cat ./manifest.json)
+        echo "Config content: $config"
+        version=$(echo "$config" | jq -r '.version')
+        echo "version=$version" >> $GITHUB_ENV
+    - name: Debug Environment
+      run: env
+
+    # Install Node.js and dependencies
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'  # 你使用的 Node.js 版本
+
+    # Build the project (根据你的构建命令调整)
+    - name: Build project
+      run: node build.js
+
+    # Upload artifact to GitHub Releases
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: ./dist/main.js  # 需要上传的文件路径
+        token: ${{ secrets.GITHUB_TOKEN }}  # 用于认证
+        tag: ${{ env.version }}  # 当前的 tag
+        body: |
+          Release notes for ${{ env.version }}
+        draft: false  # 是否保存为草稿
+        prerelease: false  # 是否标记为预发布
+        allowUpdates: true
