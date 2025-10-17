@@ -39,7 +39,7 @@ jobs:
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:
-        artifacts: ./dist/main.js  # 需要上传的文件路径
+        artifacts: ./dist/main.user.js  # 需要上传的文件路径
         token: ${{ secrets.GITHUB_TOKEN }}  # 用于认证
         tag: ${{ env.version }}  # 当前的 tag
         body: |
